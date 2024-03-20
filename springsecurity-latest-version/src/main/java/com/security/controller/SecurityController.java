@@ -1,0 +1,62 @@
+package com.security.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.security.entity.Product;
+import com.security.entity.User;
+import com.security.repository.ProductRepository;
+import com.security.repository.UserRepository;
+
+@RestController
+public class SecurityController {
+
+	@Autowired
+	ProductRepository prodRepo;
+	
+	@Autowired
+	UserRepository userRepo;
+	
+	@Autowired
+	PasswordEncoder passwordEncoder;
+	
+	@GetMapping("/home")
+	public String home() {
+		return "Welcome to spring boot security home page";
+	}
+	
+	@GetMapping("products/{id}")
+	@PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+//	@PreAuthorize("hasRole('ROLE_USER') Or hasRole('ROLE_ADMIN')")
+	public Product getById(@PathVariable int id){
+		return prodRepo.findById(id).get();
+	}
+	
+	@GetMapping("products/all")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public List<Product> getAll(){
+		return prodRepo.findAll();
+	}
+	
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	@PostMapping("products/add")
+	public Product addProduct(@RequestBody @Validated Product product) {
+		return prodRepo.save(product);
+	}
+	
+	@PostMapping("/add")
+	public User postMethodName(@RequestBody User user) {
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return userRepo.save(user);
+	}
+	
+}

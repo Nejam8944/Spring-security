@@ -1,0 +1,21 @@
+package com.security.configuration;
+
+import java.util.Optional;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import com.security.entity.User;
+import com.security.repository.UserRepository;
+
+public class userInfoUserDetailsService implements UserDetailsService {
+
+	UserRepository repo;
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		 Optional<User> opt =  repo.findById(username);
+		return opt.map(UserInfoUserDetails::new);
+	}
+
+}

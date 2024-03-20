@@ -1,0 +1,71 @@
+package com.security.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.security.entity.AuthRequest;
+import com.security.entity.Product;
+import com.security.entity.User;
+import com.security.repository.ProductRepository;
+import com.security.repository.UserRepository;
+import com.security.services.JwtService;
+
+import io.jsonwebtoken.Jwts;
+
+@RestController
+public class SecurityController {
+
+	@Autowired
+	ProductRepository prodRepo;
+	
+	@Autowired
+	UserRepository userRepo;
+	
+	@Autowired
+	PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	JwtService jwtService;
+	
+	@GetMapping("/home")
+	public String home() {
+		return "Welcome to SBC this is ensecure page";
+	}
+	
+	@PostMapping("/add")
+	public User addUser(@RequestBody @Validated User user) {
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return userRepo.save(user);
+	}
+	
+	@GetMapping("/products/all")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public List<Product> getAll() {
+		return prodRepo.findAll();
+	}
+	
+	@GetMapping("/products/{id}")
+	@PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+	public Product getOne(@PathVariable int id) {
+		return prodRepo.findById(id).get();
+	}
+	
+	@PostMapping("/authenticate")
+	public String authenticateAndGenerateToken(@RequestBody AuthRequest authRequest) {
+		
+		return jwtService.generateToken(authRequest.getUsername());	
+	}
+	
+}

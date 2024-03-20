@@ -1,0 +1,10 @@
+JWT token -->> Json Web Token 
+		   --This is a token which contains only three component(header, subject , ecryption signature)
+		   --It also contains all authentication and authorization detail in claim along with expiry details.
+		   
+
+Nejam(ADMIN) - eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJOZWphbSIsImlhdCI6MTcxMDk1OTE2NywiZXhwIjoxNzEwOTYwOTY3fQ.vF3U62QJ481N3x2SaMFMZ-t_oMmbu-SCKj-Qvlr3TvI
+--->> This person can access all the endpoints permissible for admin using this token until and unlesh token is expired
+
+Masuda(USER) - eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNYXN1ZGEiLCJpYXQiOjE3MTA5NTkyMDIsImV4cCI6MTcxMDk2MTAwMn0.ukyIQPb4eAa5_WtejQbgVaw8EweTEBfkUoEsr5_aYOA
+--->> This person can access all the endpoints permissible for user only using this token until and unlesh token is expired
